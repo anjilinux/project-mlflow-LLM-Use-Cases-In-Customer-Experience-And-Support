@@ -29,7 +29,7 @@ pipeline {
         stage("Checkout Code") {
             steps {
                 git branch: "master",
-                    url: "https://github.com/YOUR_REPO.git"
+                    url: "https://github.com/anjilinux/project-mlflow-LLM-Use-Cases-In-Customer-Experience-And-Support.git"
             }
         }
 
