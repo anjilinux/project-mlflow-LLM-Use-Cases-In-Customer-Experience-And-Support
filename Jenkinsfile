@@ -108,7 +108,7 @@ stage("Lint") {
     }
 }
 
-stage("Ingest Data") {
+stage("Ingest Data1") {
     steps {
         sh '''
         . $VENV_NAME/bin/activate
@@ -123,7 +123,7 @@ stage("Ingest Data") {
 }
 
 
-stage("RAG Pipeline") {
+stage("RAG Pipeline1") {
     steps {
         sh '''
         . $VENV_NAME/bin/activate
