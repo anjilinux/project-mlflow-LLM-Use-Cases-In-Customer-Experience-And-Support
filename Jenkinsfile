@@ -29,7 +29,7 @@ pipeline {
         #pip install --upgrade pip
 
         # Install required packages if not already installed
-        pip install --upgrade langchain-openai langchain-community faiss-cpu pytest fastapi[all]
+        #pip install --upgrade langchain-openai langchain-community faiss-cpu pytest fastapi[all]
         '''
     }
 }
