@@ -25,6 +25,11 @@ pipeline {
                 
                 # Install required packages
                 pip install langchain-openai langchain-community faiss-cpu pytest
+                pipx install langchain-openai
+                pipx install langchain-community
+                pip install --break-system-packages langchain-openai langchain-community faiss-cpu
+
+            
                 """
             }
         }
