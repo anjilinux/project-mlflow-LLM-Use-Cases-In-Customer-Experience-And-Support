@@ -8,32 +8,31 @@ pipeline {
         OPENAI_API_KEY = "dummy"
     }
 
-    stages {
+   stage('Setup Python Environment') {
+    steps {
+        echo "⚡ Setting up virtual environment..."
+        sh '''
+        #!/bin/bash
+        VENV_DIR=$WORKSPACE/venv_llm
 
-        stage('Setup Python Environment') {
-            steps {
-                echo "⚡ Setting up virtual environment..."
-                sh """
-                # Remove old venv if exists
-                [ -d $VENV_DIR ] && rm -rf $VENV_DIR
-                
-                # Create a fresh virtual environment
-                python3 -m venv $VENV_DIR
-                source $VENV_DIR/bin/activate
-                
-                # Upgrade pip
-                pip install --upgrade pip
-                
-                # Install required packages
-                pip install langchain-openai langchain-community faiss-cpu pytest
-                pipx install langchain-openai
-                pipx install langchain-community
-                pip install --break-system-packages langchain-openai langchain-community faiss-cpu
+        # Remove old venv if exists
+        [ -d "$VENV_DIR" ] && rm -rf "$VENV_DIR"
 
-            
-                """
-            }
-        }
+        # Create a fresh virtual environment
+        python3 -m venv "$VENV_DIR"
+
+        # Activate venv
+        . "$VENV_DIR/bin/activate"
+
+        # Upgrade pip
+        pip install --upgrade pip
+
+        # Install required packages
+        pip install langchain-openai langchain-community faiss-cpu pytest
+        '''
+    }
+}
+
 
         stage('Lint Python Files') {
             steps {
