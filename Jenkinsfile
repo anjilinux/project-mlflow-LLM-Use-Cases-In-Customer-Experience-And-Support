@@ -166,7 +166,7 @@ stage('Vector Store') {
         . venv/bin/activate
 
         echo "🔹 Installing requirements"
-        pip install --upgrade pip
+      
         pip install -r requirements.txt
 
         echo "🔹 Running vector_store.py"
