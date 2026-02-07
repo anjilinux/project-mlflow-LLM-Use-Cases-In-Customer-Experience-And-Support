@@ -22,8 +22,8 @@ pipeline {
                 . "$VENV_DIR/bin/activate"
 
                 # Upgrade pip and install packages only if not already installed
-                pip install --upgrade pip
-                pip install langchain faiss-cpu pytest fastapi[all] || true
+                #pip install --upgrade pip
+                #pip install langchain faiss-cpu pytest fastapi[all] || true
                 '''
             }
         }
