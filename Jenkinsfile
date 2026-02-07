@@ -81,8 +81,8 @@ pipeline {
 
     post {
         always {
-            echo "Cleaning up..."
-            sh "deactivate || true"
+            echo "hi"
+            
         }
     }
 }
