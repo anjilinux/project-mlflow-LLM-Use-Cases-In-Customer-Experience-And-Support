@@ -52,16 +52,17 @@ pipeline {
         /* ================================
            3. Setup Python Virtual Environment
         ================================= */
-        stage("Setup Virtual Environment") {
-            steps {
-                sh '''
-                python3 -m venv $VENV_NAME
-                . $VENV_NAME/bin/activate
-   
-                pip install -r requirements.txt
-                '''
-            }
-        }
+stage("Setup Virtual Environment") {
+    steps {
+        sh '''
+        python3 -m venv $VENV_NAME
+        . $VENV_NAME/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov flake8 black
+        '''
+    }
+}
 
         /* ================================
            4. Validate Knowledge Base
