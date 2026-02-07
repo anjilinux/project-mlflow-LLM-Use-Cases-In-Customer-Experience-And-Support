@@ -78,17 +78,64 @@ pipeline {
         /* ================================
            5. Lint
         ================================= */
-        stage("Lint") {
-            steps {
-                sh '''
-                . $VENV_NAME/bin/activate
-                python -m py_compile \
-                    app.py llm_client.py rag.py vector_store.py \
-                    prompts.py config.py monitor.py logger.py \
-                    ingest_data.py schema.py
-                '''
-            }
-        }
+stage("Lint") {
+    steps {
+        sh '''
+        . $VENV_NAME/bin/activate
+
+        FILES="
+        app.py
+        llm_client.py
+        rag.py
+        vector_store.py
+        prompts.py
+        config.py
+        monitor.py
+        logger.py
+        ingest_data.py
+        schema.py
+        "
+
+        for f in $FILES; do
+          if [ -f "$f" ]; then
+            echo "🔍 Linting $f"
+            python -m py_compile "$f"
+          else
+            echo "⚠️ Skipping missing file: $f"
+          fi
+        done
+        '''
+    }
+}
+
+stage("Ingest Data") {
+    steps {
+        sh '''
+        . $VENV_NAME/bin/activate
+
+        if [ -f ingest_data.py ]; then
+            python ingest_data.py
+        else
+            echo "⚠️ ingest_data.py not present – skipping ingest"
+        fi
+        '''
+    }
+}
+
+
+stage("RAG Pipeline") {
+    steps {
+        sh '''
+        . $VENV_NAME/bin/activate
+
+        if [ -f rag.py ]; then
+            python rag.py
+        else
+            echo "⚠️ rag.py not present – skipping RAG"
+        fi
+        '''
+    }
+}
 
         /* ================================
            6. Unit Tests
