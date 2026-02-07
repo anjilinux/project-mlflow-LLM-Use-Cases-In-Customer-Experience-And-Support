@@ -8,24 +8,28 @@ pipeline {
 
     stages {
 
-        stage('Setup Python Environment') {
-            steps {
-                echo "⚡ Setting up virtual environment..."
-                sh '''
-                #!/bin/bash
-                # Only create venv if missing
-                if [ ! -d "$VENV_DIR" ]; then
-                    python3 -m venv "$VENV_DIR"
-                fi
+stage('Setup Python Environment') {
+    steps {
+        echo "⚡ Setting up virtual environment..."
+        sh '''
+        #!/bin/bash
+        VENV_DIR=$WORKSPACE/venv_llm
 
-                . "$VENV_DIR/bin/activate"
+        if [ ! -d "$VENV_DIR" ]; then
+            python3 -m venv "$VENV_DIR"
+            . "$VENV_DIR/bin/activate"
+            pip install --upgrade pip setuptools wheel
+            pip install "langchain[faiss]" langchain-openai langchain-community faiss-cpu pytest fastapi[all]
+        else
+            echo "Using existing virtual environment..."
+            . "$VENV_DIR/bin/activate"
+        fi
+        '''
+    }
+}
 
-                # Upgrade pip and install dependencies
-                #pip install --upgrade pip
-                #pip install langchain faiss-cpu pytest fastapi[all] python-dotenv pydantic 
-                '''
-            }
-        }
+
+
 
         stage('Lint Python Files') {
             steps {
@@ -56,6 +60,19 @@ pipeline {
                 '''
             }
         }
+
+
+stage('Verify FAISS') {
+    steps {
+        sh '''
+        . "$VENV_DIR/bin/activate"
+        python -c "from langchain.vectorstores import FAISS; print('FAISS is installed ✅')"
+        '''
+    }
+}
+
+
+
 
         stage('Run RAG Pipeline') {
             steps {
