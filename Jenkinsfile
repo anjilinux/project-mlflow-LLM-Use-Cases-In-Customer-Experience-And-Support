@@ -164,17 +164,28 @@ stage('Setup Env') {
         /* ================================
            9. Vector Store
         ================================= */
-        stage("Vector Store") {
-            steps {
-                sh '''
-                . $VENV_NAME/bin/activate
-                python - <<EOF
-import vector_store
-print("✅ vector_store loaded")
-EOF
-                '''
-            }
-        }
+ 
+
+stage('Vector Store') {
+    steps {
+        sh '''
+        #!/bin/bash
+        set -e  # Fail fast if any command fails
+
+        echo "🔹 Activating virtual environment"
+        . venv/bin/activate
+
+        echo "🔹 Installing requirements"
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+        echo "🔹 Running vector_store.py"
+        python vector_store.py
+        '''
+    }
+}
+
+
 
         /* ================================
            10. Prompts
