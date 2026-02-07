@@ -19,6 +19,7 @@ stage('Setup Python Environment') {
             python3 -m venv "$VENV_DIR"
             . "$VENV_DIR/bin/activate"
             pip install --upgrade pip setuptools wheel
+            pip install faiss-cpu 
             pip install "langchain[faiss]" langchain-openai langchain-community faiss-cpu pytest fastapi[all]
         else
             echo "Using existing virtual environment..."
