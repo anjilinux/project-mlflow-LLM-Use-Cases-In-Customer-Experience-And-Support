@@ -8,6 +8,8 @@ pipeline {
         OPENAI_API_KEY = "dummy"
     }
 
+    stages{
+
    stage('Setup Python Environment') {
     steps {
         echo "⚡ Setting up virtual environment..."
