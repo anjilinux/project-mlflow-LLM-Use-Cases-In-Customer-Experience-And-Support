@@ -1,6 +1,5 @@
-# Modern LangChain imports
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores.faiss import FAISS
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
 from config import Config
 
 def load_vector_store(texts):
