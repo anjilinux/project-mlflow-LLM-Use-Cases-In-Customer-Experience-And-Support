@@ -21,7 +21,7 @@ pipeline {
                 . "$VENV_DIR/bin/activate"
 
                 # Upgrade pip
-                pip install --upgrade pip
+               # pip install --upgrade pip
 
                 # Install required packages
                 pip install langchain-openai langchain-community faiss-cpu pytest
