@@ -148,6 +148,19 @@ EOF
             }
         }
 
+
+stage('Setup Env') {
+    steps {
+        sh '''
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        '''
+    }
+}
+
+
+
         /* ================================
            9. Vector Store
         ================================= */
