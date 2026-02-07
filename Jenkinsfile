@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VENV_DIR = "${WORKSPACE}/venv_llm"
-        OPENAI_API_KEY = "dummy"  // safe for testing
+        OPENAI_API_KEY = "dummy"  // temporary dummy for testing
     }
 
     stages {
@@ -13,27 +13,26 @@ pipeline {
                 echo "⚡ Setting up virtual environment..."
                 sh '''
                 #!/bin/bash
-                # Only create venv if it doesn't exist
+                # Only create venv if missing
                 if [ ! -d "$VENV_DIR" ]; then
                     python3 -m venv "$VENV_DIR"
                 fi
 
-                # Activate venv
                 . "$VENV_DIR/bin/activate"
 
-                # Upgrade pip and install packages only if not already installed
+                # Upgrade pip and install dependencies
                 #pip install --upgrade pip
-                #pip install langchain faiss-cpu pytest fastapi[all] || true
+                #pip install langchain faiss-cpu pytest fastapi[all] python-dotenv pydantic || true
                 '''
             }
         }
 
         stage('Lint Python Files') {
             steps {
-                echo "🔍 Linting Python files..."
+                echo "🔍 Linting all Python files..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python -m py_compile llm_client.py rag.py vector_store.py prompts.py config.py monitor.py logger.py schema.py || true
+                python -m py_compile app.py llm_client.py rag.py prompts.py config.py schema.py logger.py monitor.py ingest_data.py vector_store.py || true
                 '''
             }
         }
@@ -48,12 +47,42 @@ pipeline {
             }
         }
 
-        stage('Run Vector Store Script') {
+        stage('Run LLM Client') {
+            steps {
+                echo "🤖 Running llm_client.py..."
+                sh '''
+                . "$VENV_DIR/bin/activate"
+                python llm_client.py || true
+                '''
+            }
+        }
+
+        stage('Run RAG Pipeline') {
+            steps {
+                echo "📚 Running rag.py..."
+                sh '''
+                . "$VENV_DIR/bin/activate"
+                python rag.py || true
+                '''
+            }
+        }
+
+        stage('Run Vector Store') {
             steps {
                 echo "🚀 Running vector_store.py..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
                 python vector_store.py || true
+                '''
+            }
+        }
+
+        stage('Ingest Data') {
+            steps {
+                echo "📥 Running ingest_data.py..."
+                sh '''
+                . "$VENV_DIR/bin/activate"
+                python ingest_data.py || true
                 '''
             }
         }
@@ -68,18 +97,24 @@ pipeline {
             }
         }
 
+        stage('Run App') {
+            steps {
+                echo "🚀 Running app.py..."
+                sh '''
+                . "$VENV_DIR/bin/activate"
+                python app.py || true
+                '''
+            }
+        }
+
     }
 
     post {
         always {
-            echo "Pipeline finished!"
+            echo "✅ Pipeline finished!"
         }
     }
 }
-
-
-
-
 
 
 
