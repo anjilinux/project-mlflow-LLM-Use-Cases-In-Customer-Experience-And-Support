@@ -22,7 +22,7 @@ pipeline {
 
                 # Upgrade pip and install dependencies
                 #pip install --upgrade pip
-                #pip install langchain faiss-cpu pytest fastapi[all] python-dotenv pydantic || true
+                #pip install langchain faiss-cpu pytest fastapi[all] python-dotenv pydantic 
                 '''
             }
         }
@@ -32,7 +32,7 @@ pipeline {
                 echo "🔍 Linting all Python files..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python -m py_compile app.py llm_client.py rag.py prompts.py config.py schema.py logger.py monitor.py ingest_data.py vector_store.py || true
+                python -m py_compile app.py llm_client.py rag.py prompts.py config.py schema.py logger.py monitor.py ingest_data.py vector_store.py 
                 '''
             }
         }
@@ -42,7 +42,7 @@ pipeline {
                 echo "🧪 Running tests..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                pytest test_dummy.py -v || true
+                pytest test_dummy.py -v 
                 '''
             }
         }
@@ -52,7 +52,7 @@ pipeline {
                 echo "🤖 Running llm_client.py..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python llm_client.py || true
+                python llm_client.py 
                 '''
             }
         }
@@ -62,7 +62,7 @@ pipeline {
                 echo "📚 Running rag.py..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python rag.py || true
+                python rag.py 
                 '''
             }
         }
@@ -72,7 +72,7 @@ pipeline {
                 echo "🚀 Running vector_store.py..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python vector_store.py || true
+                python vector_store.py 
                 '''
             }
         }
@@ -82,7 +82,7 @@ pipeline {
                 echo "📥 Running ingest_data.py..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python ingest_data.py || true
+                python ingest_data.py 
                 '''
             }
         }
@@ -92,7 +92,7 @@ pipeline {
                 echo "🧪 FastAPI Smoke Test..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python fastapi_smoke_test.py || true
+                python fastapi_smoke_test.py 
                 '''
             }
         }
@@ -102,18 +102,14 @@ pipeline {
                 echo "🚀 Running app.py..."
                 sh '''
                 . "$VENV_DIR/bin/activate"
-                python app.py || true
+                python app.py 
                 '''
             }
         }
 
     }
 
-    post {
-        always {
-            echo "✅ Pipeline finished!"
-        }
-    }
+   
 }
 
 
@@ -548,7 +544,7 @@ pipeline {
 
 //                 sleep 5
 //                 curl -f http://localhost:$APP_PORT/health
-//                 pkill -f "uvicorn app:app" || true
+//                 pkill -f "uvicorn app:app" 
 //                 '''
 //             }
 //         }
@@ -581,7 +577,7 @@ pipeline {
 //         stage("Docker Run CPU") {
 //             steps {
 //                 sh '''
-//                 docker rm -f llm-cpu || true
+//                 docker rm -f llm-cpu 
 //                 docker run -d \
 //                   -p 8777:8005 \
 //                   -e MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI \
@@ -604,7 +600,7 @@ pipeline {
 //             }
 //             steps {
 //                 sh '''
-//                 docker rm -f llm-gpu || true
+//                 docker rm -f llm-gpu 
 //                 docker run -d \
 //                   --gpus all \
 //                   -p 8788:8005 \
@@ -637,6 +633,6 @@ pipeline {
 //     post {
 //         success { echo "✅ LLM Customer Support Pipeline SUCCESS (CPU + GPU)" }
 //         failure { echo "❌ Pipeline FAILED – Check logs" }
-//         always { sh 'docker ps -a || true' }
+//         always { sh 'docker ps -a ' }
 //     }
 // }
