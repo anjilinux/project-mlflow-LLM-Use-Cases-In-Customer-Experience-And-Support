@@ -158,7 +158,7 @@ EOF
 
 stage('Vector Store') {
     steps {
-
+       . $VENV_NAME/bin/activate
        sh "pip install -U langchain-openai langchain-community faiss-cpu"
         sh 'pip install langchain-openai'
 
