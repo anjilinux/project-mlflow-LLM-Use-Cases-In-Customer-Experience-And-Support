@@ -158,6 +158,10 @@ EOF
 
 stage('Vector Store') {
     steps {
+
+       sh "pip install -U langchain-openai langchain-community faiss-cpu"
+        sh 'pip install langchain-openai'
+
         sh '''
         #!/bin/bash
         set -e  # Fail fast if any command fails
