@@ -14,10 +14,7 @@ pipeline {
                 sh '''
                 #!/bin/bash
 
-                # Remove old venv if exists
-                [ -d "$VENV_DIR" ] && rm -rf "$VENV_DIR"
 
-                # Create a fresh virtual environment
                 python3 -m venv "$VENV_DIR"
 
                 # Activate venv
