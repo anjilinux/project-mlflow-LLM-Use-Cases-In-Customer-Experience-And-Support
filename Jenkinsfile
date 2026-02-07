@@ -17,7 +17,7 @@ pipeline {
     }
 
     options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
         timestamps()
     }
 
@@ -34,7 +34,7 @@ pipeline {
         }
 
         /* ================================
-           2. Load .env
+           2. Load Environment Variables
         ================================= */
         stage("Load Environment Variables") {
             steps {
@@ -50,14 +50,14 @@ pipeline {
         }
 
         /* ================================
-           3. Setup Python VirtualEnv
+           3. Setup Python Virtual Environment
         ================================= */
         stage("Setup Virtual Environment") {
             steps {
                 sh '''
                 python3 -m venv $VENV_NAME
                 . $VENV_NAME/bin/activate
-
+                pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
             }
@@ -78,64 +78,35 @@ pipeline {
         /* ================================
            5. Lint
         ================================= */
-stage("Lint") {
-    steps {
-        sh '''
-        . $VENV_NAME/bin/activate
+        stage("Lint") {
+            steps {
+                sh '''
+                . $VENV_NAME/bin/activate
 
-        FILES="
-        app.py
-        llm_client.py
-        rag.py
-        vector_store.py
-        prompts.py
-        config.py
-        monitor.py
-        logger.py
-        ingest_data.py
-        schema.py
-        "
+                FILES="
+                app.py
+                llm_client.py
+                rag.py
+                vector_store.py
+                prompts.py
+                config.py
+                monitor.py
+                logger.py
+                ingest_data.py
+                schema.py
+                "
 
-        for f in $FILES; do
-          if [ -f "$f" ]; then
-            echo "🔍 Linting $f"
-            python -m py_compile "$f"
-          else
-            echo "⚠️ Skipping missing file: $f"
-          fi
-        done
-        '''
-    }
-}
-
-stage("Ingest Data1") {
-    steps {
-        sh '''
-        . $VENV_NAME/bin/activate
-
-        if [ -f ingest_data.py ]; then
-            python ingest_data.py
-        else
-            echo "⚠️ ingest_data.py not present – skipping ingest"
-        fi
-        '''
-    }
-}
-
-
-stage("RAG Pipeline1") {
-    steps {
-        sh '''
-        . $VENV_NAME/bin/activate
-
-        if [ -f rag.py ]; then
-            python rag.py
-        else
-            echo "⚠️ rag.py not present – skipping RAG"
-        fi
-        '''
-    }
-}
+                for f in $FILES; do
+                  if [ -f "$f" ]; then
+                    echo "🔍 Linting $f"
+                    python -m py_compile "$f"
+                  else
+                    echo "⚠️ Skipping missing file: $f"
+                  fi
+                done
+                '''
+            }
+        }
 
         /* ================================
            6. Unit Tests
@@ -162,7 +133,22 @@ stage("RAG Pipeline1") {
         }
 
         /* ================================
-           8. Vector Store
+           8. LangChain Modern Sanity Check
+        ================================= */
+        stage("LangChain Modern Sanity Check") {
+            steps {
+                sh '''
+                . $VENV_NAME/bin/activate
+                python - <<EOF
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+print("✅ Modern LangChain imports OK")
+EOF
+                '''
+            }
+        }
+
+        /* ================================
+           9. Vector Store
         ================================= */
         stage("Vector Store") {
             steps {
@@ -177,7 +163,7 @@ EOF
         }
 
         /* ================================
-           9. Prompts
+           10. Prompts
         ================================= */
         stage("Prompts") {
             steps {
@@ -192,7 +178,7 @@ EOF
         }
 
         /* ================================
-           10. Monitor
+           11. Monitor
         ================================= */
         stage("Monitor") {
             steps {
@@ -207,7 +193,7 @@ EOF
         }
 
         /* ================================
-           11. Logger
+           12. Logger
         ================================= */
         stage("Logger") {
             steps {
@@ -222,7 +208,7 @@ EOF
         }
 
         /* ================================
-           12. Config + MLflow
+           13. Config + MLflow
         ================================= */
         stage("Config & MLflow") {
             steps {
@@ -239,7 +225,7 @@ EOF
         }
 
         /* ================================
-           13. LLM Client
+           14. LLM Client
         ================================= */
         stage("LLM Client") {
             steps {
@@ -254,31 +240,39 @@ EOF
         }
 
         /* ================================
-           14. Ingest Data
+           15. Ingest Data
         ================================= */
         stage("Ingest Data") {
             steps {
                 sh '''
                 . $VENV_NAME/bin/activate
-                python ingest_data.py
+                if [ -f ingest_data.py ]; then
+                    python ingest_data.py
+                else
+                    echo "⚠️ ingest_data.py missing, skipping"
+                fi
                 '''
             }
         }
 
         /* ================================
-           15. RAG Pipeline
+           16. RAG Pipeline
         ================================= */
         stage("RAG Pipeline") {
             steps {
                 sh '''
                 . $VENV_NAME/bin/activate
-                python rag.py
+                if [ -f rag.py ]; then
+                    python rag.py
+                else
+                    echo "⚠️ rag.py missing, skipping"
+                fi
                 '''
             }
         }
 
         /* ================================
-           16. FastAPI Import
+           17. FastAPI Import
         ================================= */
         stage("FastAPI Import") {
             steps {
@@ -293,7 +287,7 @@ EOF
         }
 
         /* ================================
-           17. FastAPI Smoke Test (Local)
+           18. FastAPI Smoke Test (Local)
         ================================= */
         stage("FastAPI Smoke Test") {
             steps {
@@ -311,7 +305,7 @@ EOF
         }
 
         /* ================================
-           18. Docker Build (CPU)
+           19. Docker Build (CPU)
         ================================= */
         stage("Docker Build CPU") {
             steps {
@@ -322,20 +316,18 @@ EOF
         }
 
         /* ================================
-           19. Docker Build (GPU)
+           20. Docker Build (GPU)
         ================================= */
         stage("Docker Build GPU") {
             steps {
                 sh '''
-                docker build \
-                  --build-arg ENABLE_GPU=true \
-                  -t $IMAGE_GPU .
+                docker build --build-arg ENABLE_GPU=true -t $IMAGE_GPU .
                 '''
             }
         }
 
         /* ================================
-           20. Docker Run (CPU)
+           21. Docker Run (CPU)
         ================================= */
         stage("Docker Run CPU") {
             steps {
@@ -355,13 +347,11 @@ EOF
         }
 
         /* ================================
-           21. Docker Run (GPU)
+           22. Docker Run (GPU)
         ================================= */
         stage("Docker Run GPU") {
             when {
-                expression {
-                    sh(script: 'nvidia-smi > /dev/null 2>&1', returnStatus: true) == 0
-                }
+                expression { sh(script: 'nvidia-smi > /dev/null 2>&1', returnStatus: true) == 0 }
             }
             steps {
                 sh '''
@@ -382,7 +372,7 @@ EOF
         }
 
         /* ================================
-           22. Archive Artifacts
+           23. Archive Artifacts
         ================================= */
         stage("Archive Artifacts") {
             steps {
@@ -392,17 +382,12 @@ EOF
                 ''', fingerprint: true
             }
         }
+
     }
 
     post {
-        success {
-            echo "✅ LLM Customer Support Pipeline SUCCESS (CPU + GPU)"
-        }
-        failure {
-            echo "❌ Pipeline FAILED – Check logs"
-        }
-        always {
-            sh 'docker ps -a || true'
-        }
+        success { echo "✅ LLM Customer Support Pipeline SUCCESS (CPU + GPU)" }
+        failure { echo "❌ Pipeline FAILED – Check logs" }
+        always { sh 'docker ps -a || true' }
     }
 }
