@@ -1,90 +1,85 @@
-
 pipeline {
     agent any
 
     environment {
         VENV_DIR = "${WORKSPACE}/venv_llm"
-    
-        OPENAI_API_KEY = "dummy"
+        OPENAI_API_KEY = "dummy"  // temporary key for testing
     }
 
-    stages{
+    stages {
 
-   stage('Setup Python Environment') {
-    steps {
-        echo "⚡ Setting up virtual environment..."
-        sh '''
-        #!/bin/bash
-        VENV_DIR=$WORKSPACE/venv_llm
+        stage('Setup Python Environment') {
+            steps {
+                echo "⚡ Setting up virtual environment..."
+                sh '''
+                #!/bin/bash
 
-        # Remove old venv if exists
-        [ -d "$VENV_DIR" ] && rm -rf "$VENV_DIR"
+                # Remove old venv if exists
+                [ -d "$VENV_DIR" ] && rm -rf "$VENV_DIR"
 
-        # Create a fresh virtual environment
-        python3 -m venv "$VENV_DIR"
+                # Create a fresh virtual environment
+                python3 -m venv "$VENV_DIR"
 
-        # Activate venv
-        . "$VENV_DIR/bin/activate"
+                # Activate venv
+                . "$VENV_DIR/bin/activate"
 
-        # Upgrade pip
-        pip install --upgrade pip
+                # Upgrade pip
+                pip install --upgrade pip
 
-        # Install required packages
-        pip install langchain-openai langchain-community faiss-cpu pytest
-        '''
-    }
-}
-
+                # Install required packages
+                pip install langchain-openai langchain-community faiss-cpu pytest
+                '''
+            }
+        }
 
         stage('Lint Python Files') {
             steps {
                 echo "🔍 Linting Python files..."
-                sh """
-                source $VENV_DIR/bin/activate
+                sh '''
+                #!/bin/bash
+                . "$VENV_DIR/bin/activate"
                 python -m py_compile llm_client.py rag.py vector_store.py prompts.py config.py monitor.py logger.py schema.py
-                """
+                '''
             }
         }
 
         stage('Run Pytests') {
             steps {
                 echo "🧪 Running tests..."
-                sh """
-                source $VENV_DIR/bin/activate
+                sh '''
+                #!/bin/bash
+                . "$VENV_DIR/bin/activate"
                 pytest test_dummy.py -v
-                """
+                '''
             }
         }
 
         stage('Run Vector Store Script') {
             steps {
                 echo "🚀 Running vector_store.py..."
-                sh """
-                source $VENV_DIR/bin/activate
+                sh '''
+                #!/bin/bash
+                . "$VENV_DIR/bin/activate"
                 python vector_store.py
-                """
+                '''
             }
         }
 
-        // Add other stages (FastAPI, RAG pipeline, Docker build, etc.)
-        // Each stage should activate the same $VENV_DIR
-        // Example:
         stage('FastAPI Smoke Test') {
             steps {
                 echo "🧪 FastAPI Smoke Test..."
-                sh """
-                source $VENV_DIR/bin/activate
+                sh '''
+                #!/bin/bash
+                . "$VENV_DIR/bin/activate"
                 python fastapi_smoke_test.py
-                """
+                '''
             }
         }
-
     }
 
     post {
         always {
-            echo "hi"
-            
+            echo "Pipeline finished!"
         }
     }
 }
