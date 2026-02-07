@@ -1,18 +1,18 @@
 # Web + API
-fastapi>=0.110.0
-uvicorn>=0.29.0
-python-dotenv>=1.0.1
-pydantic>=2.6.0
+fastapi
+uvicorn
+python-dotenv
+pydantic
 
 # LLM + Vector Stores
-langchain>=0.1.16
-langchain-openai>=0.1.7
-langchain-community>=0.0.32
+langchain
+langchain-openai
+langchain-community
 
-openai>=1.10.0
-tiktoken>=0.6.0
-faiss-cpu>=1.8.0
+openai
+tiktoken
+faiss-cpu
 
 # Logging & Monitoring
-loguru>=0.7.2
-prometheus-client>=0.20.0
+loguru
+prometheus-client
