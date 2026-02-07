@@ -4,7 +4,8 @@ pipeline {
 
     environment {
         VENV_DIR = "${WORKSPACE}/venv_llm"
-        OPENAI_API_KEY = credentials('OPENAI_API_KEY')  // Make sure you have this in Jenkins credentials
+    
+        OPENAI_API_KEY = "dummy"
     }
 
     stages {
