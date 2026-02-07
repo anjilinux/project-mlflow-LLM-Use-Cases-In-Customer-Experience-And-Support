@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic
+langchain
+openai
+faiss-cpu
+tiktoken
+loguru
+prometheus-client
